@@ -126,6 +126,7 @@ public class NCLCausalConnector<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         if(condition != null) ((NCLElementPrototype) condition).setDoc(doc);
@@ -284,7 +285,6 @@ public class NCLCausalConnector<T extends NCLElement,
         
         if(conn_params.remove(param)){
             notifyRemoved((T) param);
-            param.setParent(null);
             return true;
         }
         return false;
@@ -632,6 +632,18 @@ public class NCLCausalConnector<T extends NCLElement,
         return null;
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        condition = null;
+        action = null;
+        
+        for(Ep p : conn_params)
+            p.clean();
+    }
+    
 
     /**
      * Function to create the child element <i>connectorParam</i>.

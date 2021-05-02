@@ -405,22 +405,27 @@ public class NCLRule<T extends NCLElement,
         if(doc == null)
             throw new NCLParsingException("Could not find document doc element");
 
-        for(Ev docVar : (ElementList<Ev>) doc.getGlobalVariables()){
-            if(docVar.getName().equals(name))
-                return docVar;
-        }
+        Ev result;
         
-        return createVariableRef(name);
+        result = (Ev) doc.getGlobalVariable(name);
+        if (result != null)
+            return result;
+        
+        result = createVariableRef(name);
+        doc.addGlobalVariable(result);
+        return result;
     }
     
     
     @Override
+    @Deprecated
     public boolean addReference(Eb reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(Eb reference) throws XMLException {
         return references.remove(reference);
     }
@@ -429,6 +434,18 @@ public class NCLRule<T extends NCLElement,
     @Override
     public ArrayList getReferences() {
         return references;
+    }
+    
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        var.removeReference(this);
+        
+        var = null;
+        comparator = null;
+        value = null;
     }
     
     

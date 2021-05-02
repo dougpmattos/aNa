@@ -252,4 +252,10 @@ public class NCLMeta<T extends NCLElement>
         else
             throw new NCLParsingException("Could not find " + att_name + " attribute.");
     }
+
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        mcontent = null;
+    }
 }

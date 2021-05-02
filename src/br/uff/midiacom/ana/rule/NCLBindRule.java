@@ -297,8 +297,9 @@ public class NCLBindRule<T extends NCLElement,
         // set the rule (required)
         att_name = NCLElementAttributes.RULE.toString();
         if(!(att_var = element.getAttribute(att_name)).isEmpty()){
-            Er rul = (Er) ((NCLRuleBase) ((NCLHead) ((NCLDoc) getDoc()).getHead()).getRuleBase()).findRule(att_var);
-            setRule(rul);
+            NCLDoc d = (NCLDoc) getDoc();
+            String[] rul = adjustReference(att_var);
+            setRule(d.getHead().findRule(rul[0], rul[1]));
         }
         else
             throw new NCLParsingException("Could not find " + att_name + " attribute.");
@@ -337,5 +338,22 @@ public class NCLBindRule<T extends NCLElement,
         }
         else
             throw new NCLParsingException("Could not find " + att_name + " attribute.");
+    }
+
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        constituent.removeReference(this);
+        
+        if(rule instanceof NCLTestRule)
+            ((Er) rule).removeReference(this);
+        else if(rule instanceof ExternalReferenceType){
+            ((R) rule).getTarget().removeReference(this);
+            ((R) rule).getAlias().removeReference(this);
+        }
+        
+        constituent = null;
+        rule = null;
     }
 }

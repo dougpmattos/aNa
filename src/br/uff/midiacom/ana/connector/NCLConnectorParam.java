@@ -269,12 +269,14 @@ public class NCLConnectorParam<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(Ep reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(Ep reference) throws XMLException {
         return references.remove(reference);
     }
@@ -283,5 +285,13 @@ public class NCLConnectorParam<T extends NCLElement,
     @Override
     public ArrayList getReferences() {
         return references;
+    }
+
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        type = null;
+        name = null;
     }
 }

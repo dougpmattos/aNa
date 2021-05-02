@@ -66,6 +66,7 @@ public abstract class NCLBase<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ei aux : imports) {
@@ -116,7 +117,6 @@ public abstract class NCLBase<T extends NCLElement,
                     + " The reference must be undone before erasing this element.");
         
         if(imports.remove(importBase)){
-            importBase.setParent(null);
             notifyRemoved((T) importBase);
             return true;
         }

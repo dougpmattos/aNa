@@ -118,6 +118,7 @@ public class NCLCompoundCondition<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ec aux : conditions) {
@@ -226,7 +227,6 @@ public class NCLCompoundCondition<T extends NCLElement,
         
         if(conditions.remove(condition)){
             notifyRemoved((T) condition);
-            condition.setParent(null);
             return true;
         }
         return false;
@@ -651,6 +651,24 @@ public class NCLCompoundCondition<T extends NCLElement,
         return null;
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(delay != null && delay instanceof NCLConnectorParam)
+            ((Ep)delay).removeReference(this);
+        
+        operator = null;
+        delay = null;
+        
+        for(Ec c : conditions)
+            c.clean();
+        
+        for(Es s : statements)
+            s.clean();
+    }
+    
 
     /**
      * Function to create the child element <i>simpleCondition</i>.

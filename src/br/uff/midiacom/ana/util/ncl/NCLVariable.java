@@ -174,12 +174,14 @@ public class NCLVariable<T extends NCLElement>
     
     
     @Override
+    @Deprecated
     public boolean addReference(T reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException {
         return references.remove(reference);
     }
@@ -191,7 +193,15 @@ public class NCLVariable<T extends NCLElement>
     }
     
     
-    @Deprecated
     @Override
+    @Deprecated
     public void load(Element element) throws XMLException {}
+
+    @Override
+    @Deprecated
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        param = null;
+    }
 }

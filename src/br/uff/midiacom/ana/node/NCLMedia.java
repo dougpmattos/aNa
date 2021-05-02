@@ -42,6 +42,7 @@ import br.uff.midiacom.ana.NCLDoc;
 import br.uff.midiacom.ana.util.SrcType;
 import br.uff.midiacom.ana.interfaces.*;
 import br.uff.midiacom.ana.NCLElement;
+import br.uff.midiacom.ana.descriptor.NCLDescriptor;
 import br.uff.midiacom.ana.util.exception.NCLParsingException;
 import br.uff.midiacom.ana.util.reference.ExternalReferenceType;
 import br.uff.midiacom.ana.util.reference.PostReferenceElement;
@@ -144,6 +145,7 @@ public class NCLMedia<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ea aux : areas) {
@@ -624,7 +626,6 @@ public class NCLMedia<T extends NCLElement,
         
         if(areas.remove(area)){
             notifyRemoved((T) area);
-            area.setParent(null);
             return true;
         }
         return false;
@@ -762,7 +763,6 @@ public class NCLMedia<T extends NCLElement,
         
         if(properties.remove(property)){
             notifyRemoved((T) property);
-            property.setParent(null);
             return true;
         }
         return false;
@@ -868,12 +868,8 @@ public class NCLMedia<T extends NCLElement,
      *          media type from the enumeration <i>NCLMediaType</i>.
      */
     public NCLMediaType getMediaType() {
-        if(getType() != null){
-            try{
-                return NCLMediaType.getEnumType(getType());
-            }
-            catch(NCLParsingException e){}
-        }
+        if(getType() != null)
+            return NCLMediaType.getEnumType(getType());
 
         if(getSrc() != null){
             try{
@@ -1142,7 +1138,8 @@ public class NCLMedia<T extends NCLElement,
         att_name = NCLElementAttributes.DESCRIPTOR.toString();
         if(!(att_var = element.getAttribute(att_name)).isEmpty()){
             NCLDoc d = (NCLDoc) getDoc();
-            setDescriptor((El) d.getReferenceManager().findDescriptorReference(d, att_var));
+            String[] des = adjustReference(att_var);
+            setDescriptor(d.getHead().findDescriptor(des[0], des[1]));
         }
     }
     
@@ -1167,7 +1164,7 @@ public class NCLMedia<T extends NCLElement,
         if(!(att_var = element.getAttribute(att_name)).isEmpty()){
             En ref = (En) new NCLMedia(att_var);
             setRefer(ref);
-            ((NCLDoc) getDoc()).getReferenceManager().waitReference(this);
+            ((NCLDoc) getDoc()).waitReference(this);
         }
     }
     
@@ -1243,16 +1240,18 @@ public class NCLMedia<T extends NCLElement,
         Object aux;
         if((aux = getRefer()) != null){
             if(aux instanceof NCLMedia)
-                return (Ei) ((En) aux).findInterface(id);
+                result = (Ei) ((En) aux).findInterface(id);
             else
-                return (Ei) ((En) ((ExternalReferenceType) aux).getTarget()).findInterface(id);
+                result = (Ei) ((En) ((ExternalReferenceType) aux).getTarget()).findInterface(id);
+            
+            if(result != null)
+                return result;
         }
         
         // search as a property
-        for (Ep p : properties) {
-            if(p.getName().toString().equals(id))
-                return (Ei) p;
-        }
+        result = (Ei) properties.get(id);
+        if(result != null)
+            return result;
         
         // search as an area
         result = (Ei) areas.get(id);
@@ -1273,6 +1272,7 @@ public class NCLMedia<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void fixReference() throws NCLParsingException {
         String aux;
         
@@ -1296,12 +1296,14 @@ public class NCLMedia<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(T reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException {
         return references.remove(reference);
     }
@@ -1313,6 +1315,42 @@ public class NCLMedia<T extends NCLElement,
     }
 
 
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(descriptor != null){
+            if(descriptor instanceof NCLLayoutDescriptor)
+                ((El)descriptor).removeReference(this);
+            else if(descriptor instanceof ExternalReferenceType){
+                ((R) descriptor).getTarget().removeReference(this);
+                ((R) descriptor).getAlias().removeReference(this);
+            }
+        }
+        
+        if(refer != null){
+            if(refer instanceof NCLMedia)
+                ((NCLMedia)refer).removeReference(this);
+            else if(refer instanceof ExternalReferenceType){
+                ((R) refer).getTarget().removeReference(this);
+                ((R) refer).getAlias().removeReference(this);
+            }
+        }
+        
+        src = null;
+        type = null;
+        descriptor = null;
+        refer = null;
+        instance = null;
+        
+        for(Ea a : areas)
+            a.clean();
+        
+        for(Ep p : properties)
+            p.clean();
+    }
+    
+    
     /**
      * Function to create the child element <i>area</i>.
      * This function must be overwritten in classes that extends this one.

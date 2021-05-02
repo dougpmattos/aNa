@@ -37,13 +37,21 @@
  *******************************************************************************/
 package br.uff.midiacom.ana.reuse;
 
+import br.uff.midiacom.ana.NCLDoc;
 import br.uff.midiacom.ana.NCLElement;
+import br.uff.midiacom.ana.connector.NCLCausalConnector;
+import br.uff.midiacom.ana.descriptor.NCLLayoutDescriptor;
+import br.uff.midiacom.ana.region.NCLRegion;
+import br.uff.midiacom.ana.rule.NCLTestRule;
+import br.uff.midiacom.ana.transition.NCLTransition;
 import br.uff.midiacom.ana.util.exception.NCLParsingException;
 import br.uff.midiacom.ana.util.enums.NCLElementAttributes;
 import br.uff.midiacom.ana.util.exception.XMLException;
 import br.uff.midiacom.ana.util.ncl.NCLIdentifiableElementPrototype;
 import br.uff.midiacom.ana.util.ElementList;
 import br.uff.midiacom.ana.util.exception.NCLRemovalException;
+import br.uff.midiacom.ana.util.reference.ExternalReferenceType;
+import br.uff.midiacom.ana.util.reference.ReferredElement;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -86,7 +94,8 @@ import org.w3c.dom.NodeList;
  * @param <Ei> 
  */
 public class NCLImportedDocumentBase<T extends NCLElement,
-                                     Ei extends NCLImportNCL>
+                                     Ei extends NCLImportNCL,
+                                     R extends ExternalReferenceType>
         extends NCLIdentifiableElementPrototype<T>
         implements NCLElement<T> {
 
@@ -106,6 +115,7 @@ public class NCLImportedDocumentBase<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ei aux : imports) {
@@ -153,7 +163,6 @@ public class NCLImportedDocumentBase<T extends NCLElement,
         
         if(imports.remove(importNCL)){
             notifyRemoved((T) importNCL);
-            importNCL.setParent(null);
             return true;
         }
         return false;
@@ -335,7 +344,166 @@ public class NCLImportedDocumentBase<T extends NCLElement,
             inst.load(el);
         }
     }
+    
+    
+    /**
+     * Searches for a connector inside the imported documents.
+     * 
+     * @param alias
+     *          alias of the importBase the imports the connector.
+     * @param id
+     *          id of the connector to be found.
+     * @return 
+     *          connector or null if no connector was found.
+     */
+    public Object findConnector(String alias, String id) throws XMLException {
+        for(Ei imp : imports){
+            if(imp.getAlias().equals(alias)){
+                NCLDoc d = (NCLDoc) imp.getImportedDoc();
+                Object ref = d.getHead().findConnector(null, id);
+                if(ref instanceof NCLCausalConnector)
+                    return createExternalRef(imp, (NCLCausalConnector) ref);
+                else
+                    return createExternalRef(imp, (NCLCausalConnector) ((R) ref).getTarget());
+            }
+        }
+        
+        return null;
+    }
+    
+    
+    /**
+     * Searches for a descriptor inside the imported documents.
+     * 
+     * @param alias
+     *          alias of the importBase the imports the descriptor.
+     * @param id
+     *          id of the descriptor to be found.
+     * @return 
+     *          descriptor or null if no descriptor was found.
+     */
+    public Object findDescriptor(String alias, String id) throws XMLException {
+        for(Ei imp : imports){
+            if(imp.getAlias().equals(alias)){
+                NCLDoc d = (NCLDoc) imp.getImportedDoc();
+                Object ref = d.getHead().findDescriptor(null, id);
+                if(ref instanceof NCLLayoutDescriptor)
+                    return createExternalRef(imp, (NCLLayoutDescriptor) ref);
+                else
+                    return createExternalRef(imp, (NCLLayoutDescriptor) ((R) ref).getTarget());
+            }
+        }
+        
+        return null;
+    }
+    
+    
+    /**
+     * Searches for a descriptor inside the imported documents.
+     * 
+     * @param focusIndex
+     *          focusIndex of the descriptor to be found.
+     * @return 
+     *          descriptor or null if no descriptor was found.
+     */
+    public Object findDescriptor(Integer focusIndex) throws XMLException {
+        for(Ei imp : imports){
+            NCLDoc d = (NCLDoc) imp.getImportedDoc();
+            Object ref = d.getHead().findDescriptor(focusIndex);
+            if(ref != null)
+                return ref;
+        }
+        
+        return null;
+    }
+    
+    
+    /**
+     * Searches for a region inside the imported documents.
+     * 
+     * @param alias
+     *          alias of the importBase the imports the region.
+     * @param id
+     *          id of the region to be found.
+     * @return 
+     *          region or null if no region was found.
+     */
+    public Object findRegion(String alias, String id) throws XMLException {
+        for(Ei imp : imports){
+            if(imp.getAlias().equals(alias)){
+                NCLDoc d = (NCLDoc) imp.getImportedDoc();
+                Object ref = d.getHead().findRegion(null, null, id);
+                if(ref instanceof NCLRegion)
+                    return createExternalRef(imp, (NCLRegion) ref);
+                else
+                    return createExternalRef(imp, (NCLRegion) ((R) ref).getTarget());
+            }
+        }
+        
+        return null;
+    }
+    
+    
+    /**
+     * Searches for a rule inside the imported documents.
+     * 
+     * @param alias
+     *          alias of the importBase the imports the rule.
+     * @param id
+     *          id of the rule to be found.
+     * @return 
+     *          rule or null if no rule was found.
+     */
+    public Object findRule(String alias, String id) throws XMLException {
+        for(Ei imp : imports){
+            if(imp.getAlias().equals(alias)){
+                NCLDoc d = (NCLDoc) imp.getImportedDoc();
+                Object ref = d.getHead().findRule(null, id);
+                if(ref instanceof NCLTestRule)
+                    return createExternalRef(imp, (NCLTestRule) ref);
+                else
+                    return createExternalRef(imp, (NCLTestRule) ((R) ref).getTarget());
+            }
+        }
+        
+        return null;
+    }
+    
+    
+    /**
+     * Searches for a transition inside the imported documents.
+     * 
+     * @param alias
+     *          alias of the importBase the imports the transition.
+     * @param id
+     *          id of the transition to be found.
+     * @return 
+     *          transition or null if no transition was found.
+     */
+    public Object findTransition(String alias, String id) throws XMLException {
+        for(Ei imp : imports){
+            if(imp.getAlias().equals(alias)){
+                NCLDoc d = (NCLDoc) imp.getImportedDoc();
+                Object ref = d.getHead().findTransition(null, id);
+                if(ref instanceof NCLTransition)
+                    return createExternalRef(imp, (NCLTransition) ref);
+                else
+                    return createExternalRef(imp, (NCLTransition) ((R) ref).getTarget());
+            }
+        }
+        
+        return null;
+    }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        for(Ei i : imports)
+            i.clean();
+    }
+    
 
     /**
      * Function to create the child element <i>importNCL</i>.
@@ -346,5 +514,17 @@ public class NCLImportedDocumentBase<T extends NCLElement,
      */
     protected Ei createImportNCL() throws XMLException {
         return (Ei) new NCLImportNCL();
+    }
+
+
+    /**
+     * Function to create a reference to an NCL element.
+     * This function must be overwritten in classes that extends this one.
+     *
+     * @return
+     *          element representing a reference to an NCL element.
+     */
+    protected R createExternalRef(Ei imp, ReferredElement ref) throws XMLException {
+        return (R) new ExternalReferenceType(imp, ref);
     }
 }

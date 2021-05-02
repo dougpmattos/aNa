@@ -45,6 +45,7 @@ import br.uff.midiacom.ana.node.NCLNode;
 import br.uff.midiacom.ana.util.exception.XMLException;
 import br.uff.midiacom.ana.util.ncl.NCLIdentifiableElementPrototype;
 import br.uff.midiacom.ana.util.ncl.NCLNamedElementPrototype;
+import br.uff.midiacom.ana.util.ncl.NCLVariable;
 import java.util.ArrayList;
 import org.w3c.dom.Element;
 
@@ -353,8 +354,13 @@ public class NCLPort<T extends NCLElement,
         if(aux != null){
             if(aux instanceof NCLIdentifiableElementPrototype)
                 return " interface='" + ((NCLIdentifiableElementPrototype) aux).getId() + "'";
-            else
-                return " interface='" + ((NCLNamedElementPrototype) aux).getName() + "'";
+            else{
+                Object name = ((NCLNamedElementPrototype) aux).getName();
+                if(name instanceof NCLVariable)
+                    return " interface='" + ((NCLVariable) aux).parse(0) + "'";
+                else
+                    return " interface='" + name.toString() + "'";
+            }
         }
         else
             return "";
@@ -377,12 +383,14 @@ public class NCLPort<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(T reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException {
         return references.remove(reference);
     }
@@ -391,5 +399,18 @@ public class NCLPort<T extends NCLElement,
     @Override
     public ArrayList getReferences() {
         return references;
+    }
+    
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        component.removeReference(this);
+        if(interfac != null)
+            interfac.removeReference(this);
+        
+        component = null;
+        interfac = null;
     }
 }

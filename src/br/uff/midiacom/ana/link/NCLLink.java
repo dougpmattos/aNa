@@ -40,7 +40,6 @@ package br.uff.midiacom.ana.link;
 import br.uff.midiacom.ana.NCLDoc;
 import br.uff.midiacom.ana.NCLElement;
 import br.uff.midiacom.ana.util.exception.NCLParsingException;
-import br.uff.midiacom.ana.NCLReferenceManager;
 import br.uff.midiacom.ana.connector.NCLCausalConnector;
 import br.uff.midiacom.ana.util.reference.ExternalReferenceType;
 import br.uff.midiacom.ana.util.enums.NCLElementAttributes;
@@ -110,6 +109,7 @@ public class NCLLink<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ep aux : linkParams) {
@@ -229,7 +229,6 @@ public class NCLLink<T extends NCLElement,
     public boolean removeLinkParam(Ep param) throws XMLException {
         if(linkParams.remove(param)){
             notifyRemoved((T) param);
-            param.setParent(null);
             return true;
         }
         return false;
@@ -314,7 +313,6 @@ public class NCLLink<T extends NCLElement,
     public boolean removeBind(Eb bind) throws XMLException {
         if(binds.remove(bind)){
             notifyRemoved((T) bind);
-            bind.setParent(null);
             return true;
         }
         return false;
@@ -538,7 +536,8 @@ public class NCLLink<T extends NCLElement,
         att_name = NCLElementAttributes.XCONNECTOR.toString();
         if(!(att_var = element.getAttribute(att_name)).isEmpty()){
             NCLDoc d = (NCLDoc) getDoc();
-            setXconnector(d.getReferenceManager().findConnectorReference(d, att_var));
+            String[] con = adjustReference(att_var);
+            setXconnector(d.getHead().findConnector(con[0], con[1]));
         }
         else
             throw new NCLParsingException("Could not find " + att_name + " attribute.");
@@ -588,6 +587,27 @@ public class NCLLink<T extends NCLElement,
         }
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(xconnector instanceof NCLCausalConnector)
+            ((Ec)xconnector).removeReference(this);
+        else{
+            ((R) xconnector).getTarget().removeReference(this);
+            ((R) xconnector).getAlias().removeReference(this);
+        }
+        
+        xconnector = null;
+        
+        for(Ep ep : linkParams)
+            ep.clean();
+        
+        for(Eb eb : binds)
+            eb.clean();
+    }
+    
 
     /**
      * Function to create the child element <i>linkParam</i>.

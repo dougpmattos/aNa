@@ -144,6 +144,7 @@ public class NCLSwitch<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ep aux : ports) {
@@ -314,7 +315,6 @@ public class NCLSwitch<T extends NCLElement,
         
         if(ports.remove(port)){
             notifyRemoved((T) port);
-            port.setParent(null);
             return true;
         }
         return false;
@@ -485,7 +485,6 @@ public class NCLSwitch<T extends NCLElement,
     public boolean removeBind(Eb bind) throws XMLException {
         if(binds.remove(bind)){
             notifyRemoved((T) bind);
-            bind.setParent(null);
             return true;
         }
         return false;
@@ -575,7 +574,6 @@ public class NCLSwitch<T extends NCLElement,
         
         if(nodes.remove(node)){
             notifyRemoved((T) node);
-            node.setParent(null);
             return true;
         }
         return false;
@@ -896,7 +894,7 @@ public class NCLSwitch<T extends NCLElement,
         if(!(att_var = element.getAttribute(att_name)).isEmpty()){
             En ref = (En) new NCLSwitch(att_var);
             setRefer(ref);
-            ((NCLDoc) getDoc()).getReferenceManager().waitReference(this);
+            ((NCLDoc) getDoc()).waitReference(this);
         }
     }
     
@@ -1071,6 +1069,7 @@ public class NCLSwitch<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void fixReference() throws NCLParsingException {
         String aux;
         
@@ -1094,12 +1093,14 @@ public class NCLSwitch<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(T reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException {
         return references.remove(reference);
     }
@@ -1110,6 +1111,36 @@ public class NCLSwitch<T extends NCLElement,
         return references;
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(refer != null){
+            if(refer instanceof NCLSwitch)
+                ((NCLSwitch)refer).removeReference(this);
+            else if(refer instanceof ExternalReferenceType){
+                ((R) refer).getTarget().removeReference(this);
+                ((R) refer).getAlias().removeReference(this);
+            }
+        }
+        
+        if(defaultComponent != null)
+            defaultComponent.removeReference(this);
+        
+        refer = null;
+        defaultComponent = null;
+        
+        for(Ep p : ports)
+            p.clean();
+        
+        for(Eb b : binds)
+            b.clean();
+        
+        for(En n : nodes)
+            n.clean();
+    }
+    
 
     /**
      * Function to create the child element <i>bindRule</i>.

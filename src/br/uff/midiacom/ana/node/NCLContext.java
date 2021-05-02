@@ -46,7 +46,6 @@ import br.uff.midiacom.ana.meta.NCLMeta;
 import br.uff.midiacom.ana.meta.NCLMetadata;
 import br.uff.midiacom.ana.NCLElement;
 import br.uff.midiacom.ana.util.exception.NCLParsingException;
-import br.uff.midiacom.ana.NCLReferenceManager;
 import br.uff.midiacom.ana.util.reference.ExternalReferenceType;
 import br.uff.midiacom.ana.util.reference.PostReferenceElement;
 import br.uff.midiacom.ana.util.enums.NCLElementAttributes;
@@ -448,7 +447,7 @@ public class NCLContext<T extends NCLElement,
 //            T ref = (T) new NCLContext(att_var);
 //            setRefer(createContextRef((En) ref));
             refer_id = att_var;
-            ((NCLDoc) getDoc()).getReferenceManager().waitReference(this);
+            ((NCLDoc) getDoc()).waitReference(this);
         }
     }
     
@@ -666,6 +665,7 @@ public class NCLContext<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void fixReference() throws NCLParsingException {
         String aux;
         
@@ -691,6 +691,26 @@ public class NCLContext<T extends NCLElement,
         }
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(refer != null){
+            if(refer instanceof NCLContext)
+                ((NCLContext)refer).removeReference(this);
+            else if(refer instanceof NCLBody)
+                ((NCLBody)refer).removeReference(this);
+            else{
+                ((R) refer).getTarget().removeReference(this);
+                ((R) refer).getAlias().removeReference(this);
+            }
+        }
+        
+        refer = null;
+        refer_id = null;
+    }
+    
 
     /**
      * Function to create the child element <i>meta</i>.

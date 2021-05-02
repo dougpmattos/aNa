@@ -117,6 +117,7 @@ public class NCLCompositeRule<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Et aux : rules) {
@@ -211,7 +212,6 @@ public class NCLCompositeRule<T extends NCLElement,
         
         if(rules.remove(rule)){
             notifyRemoved((T) rule);
-            rule.setParent(null);
             return true;
         }
         return false;
@@ -520,12 +520,14 @@ public class NCLCompositeRule<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(Eb reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(Eb reference) throws XMLException {
         return references.remove(reference);
     }
@@ -536,6 +538,17 @@ public class NCLCompositeRule<T extends NCLElement,
         return references;
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        operator = null;
+        
+        for(Et r : rules)
+            r.clean();
+    }
+    
 
     /**
      * Function to create the child element <i>compositeRule</i>.

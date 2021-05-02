@@ -56,12 +56,16 @@ public enum NCLConditionOperator {
         this.name = name;
     }
 
-    public static NCLConditionOperator getEnumType(String name) throws NCLParsingException{
+    public static NCLConditionOperator getEnumType(String name){
         for(NCLConditionOperator opt : values()){
             if(name.equals(opt.name))
                 return opt;
         }
-        throw new NCLParsingException("Could not find " + name +" type");
+        return null;
+    }
+    
+    public NCLConditionOperator getDefaultValue(){
+        return OR;
     }
 
     @Override

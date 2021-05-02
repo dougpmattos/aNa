@@ -244,6 +244,9 @@ public class NCLSimpleAction<T extends NCLElement,
         else
             throw new XMLException("Wrong value type.");
         
+        if(aux != null && aux instanceof NCLConnectorParam)
+                ((Ep) aux).removeReference(this);
+        
         notifyAltered(NCLElementAttributes.VALUE, aux, value);
     }
     
@@ -572,6 +575,9 @@ public class NCLSimpleAction<T extends NCLElement,
         else
             throw new XMLException("Wrong repeat type.");
         
+        if(aux != null && aux instanceof NCLConnectorParam)
+                ((Ep) aux).removeReference(this);
+        
         notifyAltered(NCLElementAttributes.REPEAT, aux, repeat);
     }
 
@@ -654,6 +660,9 @@ public class NCLSimpleAction<T extends NCLElement,
         else
             throw new XMLException("Wrong delay type.");
         
+        if(aux != null && aux instanceof NCLConnectorParam)
+                ((Ep) aux).removeReference(this);
+        
         notifyAltered(NCLElementAttributes.REPEATDELAY, aux, repeatDelay);
     }
 
@@ -719,8 +728,12 @@ public class NCLSimpleAction<T extends NCLElement,
             if("".equals(value.trim()))
                 throw new XMLException("Empty delay String");
             
-            if(!value.contains("$"))
+            if(!value.contains("$")){
+                // Take out the s for the seconds
+                if(value.endsWith("s"))
+                    value = value.substring(0, value.length() - 1);
                 this.duration = new Double(value);
+            }
             else{
                 this.duration = findConnectorParam(value.substring(1));
                 ((Ep) this.duration).addReference(this);
@@ -734,6 +747,9 @@ public class NCLSimpleAction<T extends NCLElement,
         }
         else
             throw new XMLException("Wrong delay type.");
+        
+        if(aux != null && aux instanceof NCLConnectorParam)
+                ((Ep) aux).removeReference(this);
         
         notifyAltered(NCLElementAttributes.DURATION, aux, duration);
     }
@@ -821,6 +837,9 @@ public class NCLSimpleAction<T extends NCLElement,
         else
             throw new XMLException("Wrong delay type.");
         
+        if(aux != null && aux instanceof NCLConnectorParam)
+                ((Ep) aux).removeReference(this);
+        
         notifyAltered(NCLElementAttributes.BY, aux, by);
     }
 
@@ -884,6 +903,9 @@ public class NCLSimpleAction<T extends NCLElement,
         }
         else
             throw new XMLException("Wrong delay type.");
+        
+        if(aux != null && aux instanceof NCLConnectorParam)
+                ((Ep) aux).removeReference(this);
         
         notifyAltered(NCLElementAttributes.DELAY, aux, delay);
     }
@@ -1301,12 +1323,14 @@ public class NCLSimpleAction<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(Eb reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(Eb reference) throws XMLException {
         return references.remove(reference);
     }
@@ -1315,5 +1339,42 @@ public class NCLSimpleAction<T extends NCLElement,
     @Override
     public ArrayList getReferences() {
         return references;
+    }
+    
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(value != null && value instanceof NCLConnectorParam)
+            ((Ep)value).removeReference(this);
+        
+        if(repeat != null && repeat instanceof NCLConnectorParam)
+            ((Ep)repeat).removeReference(this);
+        
+        if(repeatDelay != null && repeatDelay instanceof NCLConnectorParam)
+            ((Ep)repeatDelay).removeReference(this);
+        
+        if(duration != null && duration instanceof NCLConnectorParam)
+            ((Ep)duration).removeReference(this);
+        
+        if(by != null && by instanceof NCLConnectorParam)
+            ((Ep)by).removeReference(this);
+        
+        if(delay != null && delay instanceof NCLConnectorParam)
+            ((Ep)delay).removeReference(this);
+        
+        value = null;
+        min = null;
+        max = null;
+        qualifier = null;
+        eventType = null;
+        actionType = null;
+        repeat = null;
+        repeatDelay = null;
+        duration = null;
+        by = null;
+        role = null;
+        delay = null;
     }
 }

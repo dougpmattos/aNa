@@ -112,6 +112,7 @@ public class NCLAssessmentStatement<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ea aux : attributeAssessments) {
@@ -202,6 +203,9 @@ public class NCLAssessmentStatement<T extends NCLElement,
         else
             throw new XMLException("Wrong repeat type.");
         
+        if(aux != null && aux instanceof NCLCausalConnector)
+                ((Ep) aux).removeReference(this);
+        
         notifyAltered(NCLElementAttributes.VALUEASSESSMENT, aux, valueAssessment);
     }
     
@@ -265,7 +269,6 @@ public class NCLAssessmentStatement<T extends NCLElement,
         
         if(attributeAssessments.remove(attribute)){
             notifyRemoved((T) attribute);
-            attribute.setParent(null);
             return true;
         }
         return false;
@@ -529,6 +532,25 @@ public class NCLAssessmentStatement<T extends NCLElement,
         return null;
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(valueAssessment != null && valueAssessment instanceof NCLConnectorParam)
+            ((Ep)valueAssessment).removeReference(this);
+        
+        comparator = null;
+        valueAssessment = null;
+        
+        for(Ea a : attributeAssessments)
+            a.clean();
+        
+//        protected NCLComparator comparator;
+//        protected Object valueAssessment;
+//        protected ElementList<Ea> attributeAssessments;
+    }
+    
 
     /**
      * Function to create the child element <i>attributeAssessment</i>.

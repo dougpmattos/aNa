@@ -137,7 +137,7 @@ public class NCLDescriptor<T extends NCLElement,
     protected Ed moveRight;
     protected Ed moveUp;
     protected Ed moveDown;
-    protected Object focusIndex;
+    protected Integer focusIndex;
     protected NCLColor focusBorderColor;
     protected Integer focusBorderWidth;
     protected PercentageType focusBorderTransparency;
@@ -177,6 +177,7 @@ public class NCLDescriptor<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ep aux : params) {
@@ -513,7 +514,7 @@ public class NCLDescriptor<T extends NCLElement,
         Object aux = this.focusIndex;
         
         if(focusIndex == null){
-            this.focusIndex = focusIndex;
+            this.focusIndex = null;
             notifyAltered(NCLElementAttributes.FOCUSINDEX, aux, focusIndex);
             return;
         }
@@ -528,11 +529,11 @@ public class NCLDescriptor<T extends NCLElement,
                 this.focusIndex = new Integer(value);
                 
             }catch(Exception e){
-                this.focusIndex = focusIndex;
+                throw new XMLException("focus index must be an integer value");
             }
         }
         else if(focusIndex instanceof Integer)
-            this.focusIndex = focusIndex;
+            this.focusIndex = (Integer) focusIndex;
         
         notifyAltered(NCLElementAttributes.FOCUSINDEX, aux, this.focusIndex);
     }
@@ -551,7 +552,7 @@ public class NCLDescriptor<T extends NCLElement,
      *          string or integer representing the focus index of the descriptor
      *          or <i>null</i> if the attribute is not defined.
      */
-    public Object getFocusIndex() {
+    public Integer getFocusIndex() {
         return focusIndex;
     }
 
@@ -981,7 +982,6 @@ public class NCLDescriptor<T extends NCLElement,
     public boolean removeDescriptorParam(Ep descriptorParam) throws XMLException {
         if(params.remove(descriptorParam)){
             notifyRemoved((T) descriptorParam);
-            descriptorParam.setParent(null);
             return true;
         }
         return false;
@@ -1305,7 +1305,8 @@ public class NCLDescriptor<T extends NCLElement,
         att_name = NCLElementAttributes.REGION.toString();
         if(!(att_var = element.getAttribute(att_name)).isEmpty()){
             NCLDoc d = (NCLDoc) getDoc();
-            setRegion(d.getReferenceManager().findRegionReference(d, att_var));
+            String[] reg = adjustReference(att_var);
+            setRegion(d.getHead().findRegion(null, reg[0], reg[1]));
         }
     }
     
@@ -1370,7 +1371,7 @@ public class NCLDescriptor<T extends NCLElement,
     protected String parseMoveLeft() {
         Ed aux = getMoveLeft();
         if(aux != null)
-            return " moveLeft='" + aux.getFocusIndex() + "'";
+            return " moveLeft='" + aux.getFocusIndex().toString() + "'";
         else
             return "";
     }
@@ -1387,7 +1388,7 @@ public class NCLDescriptor<T extends NCLElement,
             desc.setFocusIndex(att_var);
             setMoveLeft((Ed) desc);
             if(!waiting){
-                ((NCLDoc) getDoc()).getReferenceManager().waitReference(this);
+                ((NCLDoc) getDoc()).waitReference(this);
                 waiting = true;
             }
         }
@@ -1397,7 +1398,7 @@ public class NCLDescriptor<T extends NCLElement,
     protected String parseMoveRight() {
         Ed aux = getMoveRight();
         if(aux != null)
-            return " moveRight='" + aux.getFocusIndex() + "'";
+            return " moveRight='" + aux.getFocusIndex().toString() + "'";
         else
             return "";
     }
@@ -1414,7 +1415,7 @@ public class NCLDescriptor<T extends NCLElement,
             desc.setFocusIndex(att_var);
             setMoveRight((Ed) desc);
             if(!waiting){
-                ((NCLDoc) getDoc()).getReferenceManager().waitReference(this);
+                ((NCLDoc) getDoc()).waitReference(this);
                 waiting = true;
             }
         }
@@ -1424,7 +1425,7 @@ public class NCLDescriptor<T extends NCLElement,
     protected String parseMoveDown() {
         Ed aux = getMoveDown();
         if(aux != null)
-            return " moveDown='" + aux.getFocusIndex() + "'";
+            return " moveDown='" + aux.getFocusIndex().toString() + "'";
         else
             return "";
     }
@@ -1441,7 +1442,7 @@ public class NCLDescriptor<T extends NCLElement,
             desc.setFocusIndex(att_var);
             setMoveDown((Ed) desc);
             if(!waiting){
-                ((NCLDoc) getDoc()).getReferenceManager().waitReference(this);
+                ((NCLDoc) getDoc()).waitReference(this);
                 waiting = true;
             }
         }
@@ -1451,7 +1452,7 @@ public class NCLDescriptor<T extends NCLElement,
     protected String parseMoveUp() {
         Ed aux = getMoveUp();
         if(aux != null)
-            return " moveUp='" + aux.getFocusIndex() + "'";
+            return " moveUp='" + aux.getFocusIndex().toString() + "'";
         else
             return "";
     }
@@ -1468,7 +1469,7 @@ public class NCLDescriptor<T extends NCLElement,
             desc.setFocusIndex(att_var);
             setMoveUp((Ed) desc);
             if(!waiting){
-                ((NCLDoc) getDoc()).getReferenceManager().waitReference(this);
+                ((NCLDoc) getDoc()).waitReference(this);
                 waiting = true;
             }
         }
@@ -1476,7 +1477,7 @@ public class NCLDescriptor<T extends NCLElement,
     
     
     protected String parseFocusIndex() {
-        Object aux = getFocusIndex();
+        Integer aux = getFocusIndex();
         if(aux != null)
             return " focusIndex='" + aux.toString() + "'";
         else
@@ -1633,7 +1634,8 @@ public class NCLDescriptor<T extends NCLElement,
         att_name = NCLElementAttributes.TRANSIN.toString();
         if(!(att_var = element.getAttribute(att_name)).isEmpty()){
             NCLDoc d = (NCLDoc) getDoc();
-            setTransIn(d.getReferenceManager().findTransitionReference(d, att_var));
+            String[] tra = adjustReference(att_var);
+            setTransIn(d.getHead().findTransition(tra[0], tra[1]));
         }
     }
     
@@ -1657,7 +1659,8 @@ public class NCLDescriptor<T extends NCLElement,
         att_name = NCLElementAttributes.TRANSOUT.toString();
         if(!(att_var = element.getAttribute(att_name)).isEmpty()){
             NCLDoc d = (NCLDoc) getDoc();
-            setTransOut(d.getReferenceManager().findTransitionReference(d, att_var));
+            String[] tra = adjustReference(att_var);
+            setTransOut(d.getHead().findTransition(tra[0], tra[1]));
         }
     }
     
@@ -1700,7 +1703,7 @@ public class NCLDescriptor<T extends NCLElement,
     
     
     @Override
-    public El findDescriptor(Object focusIndex) throws XMLException {
+    public El findDescriptor(Integer focusIndex) throws XMLException {
         if(this.focusIndex != null && this.focusIndex.toString().equals(focusIndex.toString()))
             return (El) this;
         else
@@ -1709,6 +1712,7 @@ public class NCLDescriptor<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void fixReference() throws NCLParsingException {
         Object aux;
         T base = getParent();
@@ -1723,25 +1727,25 @@ public class NCLDescriptor<T extends NCLElement,
         try{
             // set the moveUp (optional)
             if((aux = getMoveUp()) != null && (aux = getMoveUp().getFocusIndex()) != null){
-                Ed desc = (Ed) ((NCLDescriptorBase) base).findDescriptor(aux);
+                Ed desc = (Ed) ((NCLDescriptorBase) base).findDescriptor((Integer) aux);
                 setMoveUp(desc);
             }
 
             // set the moveRight (optional)
             if((aux = getMoveRight()) != null && (aux = getMoveRight().getFocusIndex()) != null){
-                Ed desc = (Ed) ((NCLDescriptorBase) base).findDescriptor(aux);
+                Ed desc = (Ed) ((NCLDescriptorBase) base).findDescriptor((Integer) aux);
                 setMoveRight(desc);
             }
 
             // set the moveLeft (optional)
             if((aux = getMoveLeft()) != null && (aux = getMoveLeft().getFocusIndex()) != null){
-                Ed desc = (Ed) ((NCLDescriptorBase) base).findDescriptor(aux);
+                Ed desc = (Ed) ((NCLDescriptorBase) base).findDescriptor((Integer) aux);
                 setMoveLeft(desc);
             }
 
             // set the moveDown (optional)
             if((aux = getMoveDown()) != null && (aux = getMoveDown().getFocusIndex()) != null){
-                Ed desc = (Ed) ((NCLDescriptorBase) base).findDescriptor(aux);
+                Ed desc = (Ed) ((NCLDescriptorBase) base).findDescriptor((Integer) aux);
                 setMoveDown(desc);
             }
         }
@@ -1758,12 +1762,14 @@ public class NCLDescriptor<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(T reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException {
         return references.remove(reference);
     }
@@ -1772,6 +1778,47 @@ public class NCLDescriptor<T extends NCLElement,
     @Override
     public ArrayList getReferences() {
         return references;
+    }
+    
+    
+    @Override
+    public void clean() throws XMLException {
+        
+        moveLeft.removeReference(this);
+        moveRight.removeReference(this);
+        moveUp.removeReference(this);
+        moveDown.removeReference(this);
+        
+        if(region != null){
+            if(region instanceof NCLRegion)
+                ((Er)region).removeReference(this);
+
+            else if(region instanceof ExternalReferenceType){
+                ((R) region).getTarget().removeReference(this);
+                ((R) region).getAlias().removeReference(this);
+            }
+        }
+        
+        player = null;
+        explicitDur = null;
+        freeze = null;
+        moveLeft = null;
+        moveRight = null;
+        moveUp = null;
+        moveDown = null;
+        focusIndex = null;
+        focusBorderColor = null;
+        focusBorderWidth = null;
+        focusBorderTransparency = null;
+        focusSrc = null;
+        focusSelSrc = null;
+        selBorderColor = null;
+        transIn = null;
+        transOut = null;
+        region = null;
+        
+        for(Ep p : params)
+            p.clean();
     }
     
 

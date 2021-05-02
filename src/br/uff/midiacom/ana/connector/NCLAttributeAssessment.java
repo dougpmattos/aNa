@@ -235,6 +235,9 @@ public class NCLAttributeAssessment<T extends NCLElement,
         else
             throw new XMLException("Wrong key type.");
         
+        if(aux != null && aux instanceof NCLConnectorParam)
+                ((Ep) aux).removeReference(this);
+        
         notifyAltered(NCLElementAttributes.KEY, aux, key);
     }
     
@@ -346,6 +349,9 @@ public class NCLAttributeAssessment<T extends NCLElement,
         }
         else
             throw new XMLException("Wrong repeat type.");
+        
+        if(aux != null && aux instanceof NCLConnectorParam)
+                ((Ep) aux).removeReference(this);
         
         notifyAltered(NCLElementAttributes.OFFSET, aux, offset);
     }
@@ -576,12 +582,14 @@ public class NCLAttributeAssessment<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(Eb reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(Eb reference) throws XMLException {
         return references.remove(reference);
     }
@@ -590,5 +598,23 @@ public class NCLAttributeAssessment<T extends NCLElement,
     @Override
     public ArrayList getReferences() {
         return references;
+    }
+    
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(key != null && key instanceof NCLConnectorParam)
+            ((Ep)key).removeReference(this);
+        
+        if(offset != null && offset instanceof NCLConnectorParam)
+            ((Ep)offset).removeReference(this);
+        
+        role = null;
+        eventType = null;
+        key = null;
+        attributeType = null;
+        offset = null;
     }
 }

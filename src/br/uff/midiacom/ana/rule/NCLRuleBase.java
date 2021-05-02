@@ -40,6 +40,7 @@ package br.uff.midiacom.ana.rule;
 import br.uff.midiacom.ana.NCLDoc;
 import br.uff.midiacom.ana.NCLElement;
 import br.uff.midiacom.ana.NCLHead;
+import br.uff.midiacom.ana.descriptor.NCLDescriptorBase;
 import br.uff.midiacom.ana.util.reference.ExternalReferenceType;
 import br.uff.midiacom.ana.util.exception.NCLParsingException;
 import br.uff.midiacom.ana.util.enums.NCLElementAttributes;
@@ -111,6 +112,7 @@ public class NCLRuleBase<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Et aux : rules) {
@@ -160,7 +162,6 @@ public class NCLRuleBase<T extends NCLElement,
         
         if(rules.remove(rule)){
             notifyRemoved((T) rule);
-            rule.setParent(null);
             return true;
         }
         return false;
@@ -419,15 +420,17 @@ public class NCLRuleBase<T extends NCLElement,
      * Searches for a rule inside a ruleBase and its descendants.
      * The rule can be a rule or a compositeRule.
      * 
+     * @param alias
+     *          alias of the importBase the imports the rule.
      * @param id
      *          id of the rule to be found.
      * @return 
      *          rule or null if no rule was found.
      */
-    public Object findRule(String id) throws XMLException {
+    public Object findRule(String alias, String id) throws XMLException {
         Object result;
         
-        if(!id.contains("#")){
+        if(alias == null){
             for(Et rule : rules){
                 result = rule.findRule(id);
                 if(result != null)
@@ -435,26 +438,10 @@ public class NCLRuleBase<T extends NCLElement,
             }
         }
         else{
-            int index = id.indexOf("#");
-            String alias = id.substring(0, index);
-            id = id.substring(index + 1);
-            
             for(Ei imp : imports){
                 if(imp.getAlias().equals(alias)){
                     NCLDoc d = (NCLDoc) imp.getImportedDoc();
-                    Object ref = findRuleReference(d, id);
-                    if(ref instanceof NCLTestRule)
-                        return createExternalRef(imp, (Et) ref);
-                    else
-                        return createExternalRef(imp, (Et) ((R) ref).getTarget());
-                }
-            }
-            
-            NCLImportedDocumentBase ib = (NCLImportedDocumentBase) ((NCLHead) getParent()).getImportedDocumentBase();
-            for(Ei imp : (ElementList<Ei>) ib.getImportNCLs()){
-                if(imp.getAlias().equals(alias)){
-                    NCLDoc d = (NCLDoc) imp.getImportedDoc();
-                    Object ref = findRuleReference(d, id);
+                    Object ref = d.getHead().findRule(null, id);
                     if(ref instanceof NCLTestRule)
                         return createExternalRef(imp, (Et) ref);
                     else
@@ -466,26 +453,16 @@ public class NCLRuleBase<T extends NCLElement,
         
         return null;
     }
-    
-    
-    protected Object findRuleReference(NCLDoc doc, String id) throws XMLException {
-        NCLHead head = (NCLHead) doc.getHead();
-        
-        if(head == null)
-            throw new NCLParsingException("Could not find document head element");
-        
-        NCLRuleBase base = (NCLRuleBase) head.getRuleBase();
-        if(base == null)
-            throw new NCLParsingException("Could not find document ruleBase element");
 
-        Object result = base.findRule(id);
-
-        if(result == null)
-            throw new NCLParsingException("Could not find rule in ruleBase with id: " + id);
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
         
-        return result;
+        for(Et r : rules)
+            r.clean();
     }
-
+    
 
     /**
      * Function to create the child element <i>rule</i>.

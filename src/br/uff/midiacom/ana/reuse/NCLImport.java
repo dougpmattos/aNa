@@ -176,8 +176,9 @@ public abstract class NCLImport<T extends NCLElement,
      * @throws XMLException 
      *          if the import element does not import a document.
      */
-    public void setImportedDoc(Ed importedDoc) {
+    public void setImportedDoc(Ed importedDoc) throws XMLException {
         this.importedDoc = importedDoc;
+        importedDoc.setParent(getDoc());
     }
     
     
@@ -243,17 +244,17 @@ public abstract class NCLImport<T extends NCLElement,
                 String sep = File.separator;
                 String loc = ((Ed) getDoc()).getLocation() + sep;
                 if(sep.equals("\\"))
-                    loc.replace('\\', '/');
+                    loc = loc.replace('\\', '/');
                 
                 URI base = new URI(loc);
                 path = base.resolve(getDocumentURI().toString());
-                aux.loadXML(new File(path.getPath()));
+                aux.loadXML(new File(path.toString()));
                 setImportedDoc(aux);
                 ((Ed) getDoc()).mergeGlobalVariables(aux);
             }catch(XMLException e){
                 throw new NCLParsingException("Error loading document: " + e.getMessage());
             }catch(URISyntaxException e){
-                throw new NCLParsingException("Could not find document in location: " + path.getPath() + e.getMessage());
+                throw new NCLParsingException("Could not find document in location: " + path.toString() + e.getMessage());
             }
         }
         catch(XMLException ex){
@@ -334,12 +335,14 @@ public abstract class NCLImport<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(T reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException {
         return references.remove(reference);
     }

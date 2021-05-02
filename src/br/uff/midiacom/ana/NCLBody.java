@@ -126,6 +126,7 @@ public class NCLBody<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         if(doc == null)
             doc = getParent(); // doc is the parent of body
@@ -461,6 +462,9 @@ public class NCLBody<T extends NCLElement,
     public En findNode(String id) throws XMLException {
         En result;
         
+        if(getId() != null && getId().equals(id))
+            return (En) this;
+        
         for(En node : nodes){
             result = (En) node.findNode(id);
             if(result != null)
@@ -503,6 +507,30 @@ public class NCLBody<T extends NCLElement,
             throw new NCLParsingException("Could not find node in ruleBase with id: " + id);
         
         return result;
+    }
+
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        for(Ept p : ports)
+            p.clean();
+        
+        for(Epp p : properties)
+            p.clean();
+        
+        for(En n : nodes)
+            n.clean();
+        
+        for(El l : links)
+            l.clean();
+        
+        for(Em m : metas)
+            m.clean();
+        
+        for(Emt m : metadatas)
+            m.clean();
     }
     
 

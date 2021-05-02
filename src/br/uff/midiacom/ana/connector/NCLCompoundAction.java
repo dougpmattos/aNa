@@ -108,6 +108,7 @@ public class NCLCompoundAction<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ea aux : actions) {
@@ -213,7 +214,6 @@ public class NCLCompoundAction<T extends NCLElement,
         
         if(actions.remove(action)){
             notifyRemoved((T) action);
-            action.setParent(null);
             return true;
         }
         return false;
@@ -504,6 +504,21 @@ public class NCLCompoundAction<T extends NCLElement,
         return null;
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(delay != null && delay instanceof NCLConnectorParam)
+            ((Ep)delay).removeReference(this);
+        
+        operator = null;
+        delay = null;
+        
+        for(Ea a : actions)
+            a.clean();
+    }
+    
 
     /**
      * Function to create the child element <i>simpleAction</i>.

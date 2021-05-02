@@ -39,7 +39,6 @@ package br.uff.midiacom.ana.reuse;
 
 import br.uff.midiacom.ana.NCLDoc;
 import br.uff.midiacom.ana.NCLElement;
-import br.uff.midiacom.ana.NCLReferenceManager;
 import br.uff.midiacom.ana.util.enums.NCLElementAttributes;
 import br.uff.midiacom.ana.region.NCLRegion;
 import br.uff.midiacom.ana.util.exception.XMLException;
@@ -216,7 +215,8 @@ public class NCLImportBase<T extends NCLElement,
         att_name = NCLElementAttributes.REGION.toString();
         if(!(att_var = element.getAttribute(att_name)).isEmpty()){
             Ed d = (Ed) getDoc();
-            setRegion((Er) d.getReferenceManager().findRegionReference(d, att_var));
+            String[] reg = adjustReference(att_var);
+            setRegion((Er) d.getHead().findRegion(null, reg[0], reg[1]));
         }
     }
     
@@ -246,5 +246,16 @@ public class NCLImportBase<T extends NCLElement,
     @Override
     protected String getType() {
         return "importBase";
+    }
+
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(region != null)
+            region.removeReference(this);
+        
+        region = null;
+        baseId = null;
     }
 }

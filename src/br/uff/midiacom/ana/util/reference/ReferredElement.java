@@ -45,9 +45,11 @@ import java.util.ArrayList;
 public interface ReferredElement<T extends NCLElement> {
     
     
+    @Deprecated
     public boolean addReference(T reference) throws XMLException;
     
     
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException;
     
     

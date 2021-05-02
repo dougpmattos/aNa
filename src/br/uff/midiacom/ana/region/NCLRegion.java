@@ -146,6 +146,7 @@ public class NCLRegion<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Er aux : regions) {
@@ -239,10 +240,15 @@ public class NCLRegion<T extends NCLElement,
                 relative = true;
             }
 
-            if(relative)
-                this.left = new Double(value);
-            else
-                this.left = new Integer(value);
+            try{
+                if(relative)
+                    this.left = new Double(value);
+                else
+                    this.left = new Integer(value);
+            }catch (java.lang.NumberFormatException ex){
+                throw new XMLException("Wrong left type.");
+            }
+            
         }
         else if(left instanceof Integer || left instanceof Double)
             this.left = left;
@@ -322,10 +328,15 @@ public class NCLRegion<T extends NCLElement,
                 relative = true;
             }
 
-            if(relative)
-                this.right = new Double(value);
-            else
-                this.right = new Integer(value);
+            try{
+                if(relative)
+                    this.right = new Double(value);
+                else
+                    this.right = new Integer(value);
+            }catch (java.lang.NumberFormatException ex){
+                throw new XMLException("Wrong right type.");
+            }
+            
         }
         else if(right instanceof Integer || right instanceof Double)
             this.right = right;
@@ -405,10 +416,15 @@ public class NCLRegion<T extends NCLElement,
                 relative = true;
             }
 
-            if(relative)
-                this.top = new Double(value);
-            else
-                this.top = new Integer(value);
+            try{
+                if(relative)
+                    this.top = new Double(value);
+                else
+                    this.top = new Integer(value);
+            }catch (java.lang.NumberFormatException ex){
+                throw new XMLException("Wrong top type.");
+            }
+            
         }
         else if(top instanceof Integer || top instanceof Double)
             this.top = top;
@@ -488,10 +504,15 @@ public class NCLRegion<T extends NCLElement,
                 relative = true;
             }
 
-            if(relative)
-                this.bottom = new Double(value);
-            else
-                this.bottom = new Integer(value);
+            try{
+                if(relative)
+                    this.bottom = new Double(value);
+                else
+                    this.bottom = new Integer(value);
+            }catch (java.lang.NumberFormatException ex){
+                throw new XMLException("Wrong bottom type.");
+            }
+            
         }
         else if(bottom instanceof Integer || bottom instanceof Double)
             this.bottom = bottom;
@@ -561,7 +582,7 @@ public class NCLRegion<T extends NCLElement,
         if(height instanceof String){
             String value = (String) height;
             if("".equals(value.trim()))
-                throw new XMLException("Empty bottom String");
+                throw new XMLException("Empty height String");
 
             boolean relative = false;
             int index = value.indexOf("%");
@@ -570,15 +591,20 @@ public class NCLRegion<T extends NCLElement,
                 relative = true;
             }
 
-            if(relative)
-                this.height = new Double(value);
-            else
-                this.height = new Integer(value);
+            try{
+                if(relative)
+                    this.height = new Double(value);
+                else
+                    this.height = new Integer(value);
+            }catch (java.lang.NumberFormatException ex){
+                throw new XMLException("Wrong height type.");
+            }
+            
         }
         else if(height instanceof Integer || height instanceof Double)
             this.height = height;
         else
-            throw new XMLException("Wrong bottom type.");
+            throw new XMLException("Wrong height type.");
         
         notifyAltered(NCLElementAttributes.HEIGHT, aux, height);
     }
@@ -643,7 +669,7 @@ public class NCLRegion<T extends NCLElement,
         if(width instanceof String){
             String value = (String) width;
             if("".equals(value.trim()))
-                throw new XMLException("Empty bottom String");
+                throw new XMLException("Empty width String");
 
             boolean relative = false;
             int index = value.indexOf("%");
@@ -652,15 +678,20 @@ public class NCLRegion<T extends NCLElement,
                 relative = true;
             }
 
-            if(relative)
-                this.width = new Double(value);
-            else
-                this.width = new Integer(value);
+            try{
+                if(relative)
+                    this.width = new Double(value);
+                else
+                    this.width = new Integer(value);
+            }catch (java.lang.NumberFormatException ex){
+                throw new XMLException("Wrong width type.");
+            }
+            
         }
         else if(width instanceof Integer || width instanceof Double)
             this.width = width;
         else
-            throw new XMLException("Wrong bottom type.");
+            throw new XMLException("Wrong width type.");
         
         notifyAltered(NCLElementAttributes.WIDTH, aux, width);
     }
@@ -789,7 +820,6 @@ public class NCLRegion<T extends NCLElement,
         
         if(regions.remove(region)){
             notifyRemoved((T) region);
-            region.setParent(null);
             return true;
         }
         return false;
@@ -1271,12 +1301,14 @@ public class NCLRegion<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(T reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException {
         return references.remove(reference);
     }
@@ -1287,6 +1319,24 @@ public class NCLRegion<T extends NCLElement,
         return references;
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        title = null;
+        left = null;
+        right = null;
+        top = null;
+        bottom = null;
+        height = null;
+        width = null;
+        zIndex = null;
+        
+        for(Er r : regions)
+            r.clean();
+    }
+    
 
     /**
      * Function to create the child element <i>region</i>.

@@ -69,6 +69,7 @@ public abstract class NCLElementPrototype<T extends NCLElement>
 
 
     @Override
+    @Deprecated
     public void setParent(T parent) throws XMLException {
         T aux = getParent();
         if(this.parent != null && parent != null)
@@ -86,6 +87,7 @@ public abstract class NCLElementPrototype<T extends NCLElement>
     }
     
     
+    @Deprecated
     public void setDoc(T doc) {
         this.doc = doc;
     }
@@ -97,6 +99,23 @@ public abstract class NCLElementPrototype<T extends NCLElement>
 
         return matcher.matches();
     }
+    
+    
+    protected String[] adjustReference(String element_id) {
+        String[] result = new String[2];
+        
+        if(element_id.contains("#")){
+            int index = element_id.indexOf("#");
+            result[0] = element_id.substring(0, index);
+            result[1] = element_id.substring(index + 1);
+        }
+        else{
+            result[0] = null;
+            result[1] = element_id;
+        }
+        
+        return result;
+    }
 
 
     /**
@@ -105,6 +124,7 @@ public abstract class NCLElementPrototype<T extends NCLElement>
      * @param inserted
      *          element inserted.
      */
+    @Deprecated
     public void notifyInserted(T inserted) throws NCLModificationException {
         notifier.addNotification(new NCLNotification(inserted));
     }
@@ -116,6 +136,7 @@ public abstract class NCLElementPrototype<T extends NCLElement>
      * @param removed
      *          element removed.
      */
+    @Deprecated
     public void notifyRemoved(T removed) throws NCLModificationException {
         notifier.addNotification(new NCLNotification(this, removed));
     }
@@ -131,6 +152,7 @@ public abstract class NCLElementPrototype<T extends NCLElement>
      * @param newValue
      *          the attribute new value.
      */
+    @Deprecated
     public void notifyAltered(NCLElementAttributes attributeName, Object oldValue, Object newValue) throws NCLModificationException {
         notifier.addNotification(new NCLNotification(this, attributeName, oldValue, newValue));
     }

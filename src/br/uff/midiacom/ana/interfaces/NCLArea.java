@@ -862,19 +862,37 @@ public class NCLArea<T extends NCLElement>
     
     
     @Override
+    @Deprecated
     public boolean addReference(T reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException {
         return references.remove(reference);
     }
     
     
     @Override
+    @Deprecated
     public ArrayList getReferences() {
         return references;
+    }
+    
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        coords = null;
+        begin = null;
+        end = null;
+        text = null;
+        position = null;
+        first = null;
+        last = null;
+        label = null;
     }
 }

@@ -104,6 +104,7 @@ public class NCLCompoundStatement<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Es aux : statements) {
@@ -244,7 +245,6 @@ public class NCLCompoundStatement<T extends NCLElement,
     public boolean removeStatement(Es statement) throws XMLException {
         if(statements.remove(statement)){
             notifyRemoved((T) statement);
-            statement.setParent(null);
             return true;
         }
         return false;
@@ -484,6 +484,17 @@ public class NCLCompoundStatement<T extends NCLElement,
         return null;
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        operator = null;
+        
+        for(Es s : statements)
+            s.clean();
+    }
+    
 
     /**
      * Function to create the child element <i>assessmentStatement</i>.

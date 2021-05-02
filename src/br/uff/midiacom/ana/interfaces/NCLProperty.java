@@ -37,6 +37,7 @@
  *******************************************************************************/
 package br.uff.midiacom.ana.interfaces;
 
+import br.uff.midiacom.ana.NCLDoc;
 import br.uff.midiacom.ana.NCLElement;
 import br.uff.midiacom.ana.util.enums.NCLColor;
 import br.uff.midiacom.ana.util.exception.NCLParsingException;
@@ -134,8 +135,10 @@ public class NCLProperty<T extends NCLElement,
             
             if((aux = NCLNodeAttributes.getEnumType(var)) != null)
                 name = aux;
-            
-            //@todo: buscar no doc as globais
+            else if((getDoc() != null) && (aux = ((NCLDoc) getDoc()).getGlobalVariable((String) name)) != null){
+                name = aux;
+                ((Ev) name).addReference(this);
+            }
             
             aux = this.name;
             this.name = name;
@@ -330,8 +333,12 @@ public class NCLProperty<T extends NCLElement,
     
     protected String parseName() {
         Object aux = getName();
-        if(aux != null)
-            return " name='" + aux.toString() + "'";
+        if(aux != null){
+            if(name instanceof NCLVariable)
+                return " name='" + ((NCLVariable) aux).parse(0) + "'";
+            else
+                return " name='" + aux.toString() + "'";
+        }
         else
             return "";
     }
@@ -369,12 +376,14 @@ public class NCLProperty<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(T reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException {
         return references.remove(reference);
     }
@@ -383,5 +392,12 @@ public class NCLProperty<T extends NCLElement,
     @Override
     public ArrayList getReferences() {
         return references;
+    }
+    
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        value = null;
     }
 }

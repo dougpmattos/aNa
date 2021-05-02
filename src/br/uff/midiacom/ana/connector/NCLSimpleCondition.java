@@ -409,6 +409,9 @@ public class NCLSimpleCondition<T extends NCLElement,
         else
             throw new XMLException("Wrong key type.");
         
+        if(aux != null && aux instanceof NCLConnectorParam)
+                ((Ep) aux).removeReference(this);
+        
         notifyAltered(NCLElementAttributes.KEY, aux, key);
     }
 
@@ -549,6 +552,9 @@ public class NCLSimpleCondition<T extends NCLElement,
         }
         else
             throw new XMLException("Wrong delay type.");
+        
+        if(aux != null && aux instanceof NCLConnectorParam)
+                ((Ep) aux).removeReference(this);
         
         notifyAltered(NCLElementAttributes.DELAY, aux, delay);
     }
@@ -834,6 +840,7 @@ public class NCLSimpleCondition<T extends NCLElement,
     }
     
     
+    @Override
     public Er findRole(String name) {
         if(role.toString().equals(name))
             return (Er) this;
@@ -843,12 +850,14 @@ public class NCLSimpleCondition<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(Eb reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(Eb reference) throws XMLException {
         return references.remove(reference);
     }
@@ -857,5 +866,26 @@ public class NCLSimpleCondition<T extends NCLElement,
     @Override
     public ArrayList getReferences() {
         return references;
+    }
+    
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(key != null && key instanceof NCLConnectorParam)
+            ((Ep)key).removeReference(this);
+        
+        if(delay != null && delay instanceof NCLConnectorParam)
+            ((Ep)delay).removeReference(this);
+        
+        key = null;
+        min = null;
+        max = null;
+        qualifier = null;
+        eventType = null;
+        transition = null;
+        role = null;
+        delay = null;
     }
 }

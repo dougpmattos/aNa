@@ -39,7 +39,6 @@ package br.uff.midiacom.ana.connector;
 
 import br.uff.midiacom.ana.NCLDoc;
 import br.uff.midiacom.ana.NCLElement;
-import br.uff.midiacom.ana.NCLReferenceManager;
 import br.uff.midiacom.ana.util.reference.ExternalReferenceType;
 import br.uff.midiacom.ana.util.exception.NCLParsingException;
 import br.uff.midiacom.ana.util.enums.NCLElementAttributes;
@@ -105,6 +104,7 @@ public class NCLConnectorBase<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ec aux : connectors) {
@@ -152,7 +152,6 @@ public class NCLConnectorBase<T extends NCLElement,
         
         if(connectors.remove(connector)){
             notifyRemoved((T) connector);
-            connector.setParent(null);
             return true;
         }
         return false;
@@ -394,29 +393,27 @@ public class NCLConnectorBase<T extends NCLElement,
     /**
      * Searches for a connector inside a connectorBase and its imported bases.
      * 
-     * @param focusIndex
-     *          focusIndex of the descriptor to be found.
+     * @param alias
+     *          alias of the importBase the imports the connector.
+     * @param id
+     *          id of the connector to be found.
      * @return 
      *          connector, reference to the connector or null if no connector
      *          was found.
      */
-    public Object findConnector(String id) throws XMLException {
-        Ec result;
+    public Object findConnector(String alias, String id) throws XMLException {
+        Object result;
         
-        if(!id.contains("#")){
+        if(alias == null){
             result = getCausalConnectors().get(id);
             if(result != null)
                 return result;
         }
         else{
-            int index = id.indexOf("#");
-            String alias = id.substring(0, index);
-            id = id.substring(index + 1);
-            
             for(Ei imp : imports){
                 if(imp.getAlias().equals(alias)){
                     NCLDoc d = (NCLDoc) imp.getImportedDoc();
-                    Object ref = ((NCLDoc) getDoc()).getReferenceManager().findConnectorReference(d, id);
+                    Object ref = d.getHead().findConnector(null, id);
                     if(ref instanceof NCLCausalConnector)
                         return createExternalRef(imp, (Ec) ref);
                     else
@@ -425,11 +422,19 @@ public class NCLConnectorBase<T extends NCLElement,
             }
         }
         
-        
         return null;
     }
 
 
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        for(Ec c : connectors)
+            c.clean();
+    }
+    
+    
     /**
      * Function to create the child element <i>causalConnector</i>.
      * This function must be overwritten in classes that extends this one.

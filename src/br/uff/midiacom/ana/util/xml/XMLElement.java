@@ -38,6 +38,7 @@
 package br.uff.midiacom.ana.util.xml;
 
 import br.uff.midiacom.ana.util.exception.XMLException;
+import java.io.Serializable;
 import org.w3c.dom.Element;
 
 
@@ -47,7 +48,7 @@ import org.w3c.dom.Element;
  * @param <T>
  *          XML element type.
  */
-public interface XMLElement<T extends XMLElement> {
+public interface XMLElement<T extends XMLElement> extends Serializable {
 
 
     /**
@@ -58,6 +59,7 @@ public interface XMLElement<T extends XMLElement> {
      * @throws XMLException
      *          f the element already has a parent element.
      */
+    @Deprecated
     public void setParent(T parent) throws XMLException;
 
 
@@ -111,4 +113,10 @@ public interface XMLElement<T extends XMLElement> {
      *          true if the elements are equal and false otherwise.
      */
     public boolean compare(T other);
+    
+    
+    /**
+     * Cleans the elements references when removed.
+     */
+    public void clean() throws XMLException;
 }

@@ -37,6 +37,7 @@
  *******************************************************************************/
 package br.uff.midiacom.ana.util;
 
+import java.io.Serializable;
 import java.util.Vector;
 
 
@@ -51,7 +52,7 @@ import java.util.Vector;
  * @see <a href="http://www.dtv.org.br/download/pt-br/ABNTNBR15606-2_2007Vc3_2008.pdf">
  *          ABNT NBR 15606-2:2007</a>
  */
-public class TimeType {
+public class TimeType implements Serializable {
 
     private Integer year;
     private Integer month;
@@ -303,7 +304,7 @@ public class TimeType {
      *          se o valor não estiver no formato definido pela norma.
      */
     public void setSecond(Integer second) throws IllegalArgumentException {
-        if(second != null && !(second >= 0 && (absoluteSecond() || second <= 59)))
+        if(second == null && !(second >= 0 && (absoluteSecond() || second <= 59)))
             throw new IllegalArgumentException("Invalid second");
 
         this.second = second.doubleValue();
@@ -393,6 +394,20 @@ public class TimeType {
             return true;
         else
             return false;
+    }
+    
+    
+    public Double getTimeInSeconds() {
+        Double result = 0.0;
+        
+        if(second != null) result += second;
+        if(minute != null) result += minute * 60;
+        if(hour != null) result += hour * 3600;
+        if(day != null) result += day * 86400;
+        if(month != null) result += month * 2592000;
+        if(year != null) result += year * 31536000;
+        
+        return result;
     }
     
     

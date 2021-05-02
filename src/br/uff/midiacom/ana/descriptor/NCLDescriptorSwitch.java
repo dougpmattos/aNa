@@ -127,6 +127,7 @@ public class NCLDescriptorSwitch<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public void setDoc(T doc) {
         super.setDoc(doc);
         for (Ed aux : descriptors) {
@@ -186,7 +187,6 @@ public class NCLDescriptorSwitch<T extends NCLElement,
         
         if(descriptors.remove(descriptor)){
             notifyRemoved((T) descriptor);
-            descriptor.setParent(null);
             return true;
         }
         return false;
@@ -319,7 +319,7 @@ public class NCLDescriptorSwitch<T extends NCLElement,
     public boolean removeBind(Eb bind) throws XMLException {
         if(binds.remove(bind)){
             notifyRemoved((T) bind);
-            bind.setParent(null);
+            bind.clean();
             return true;
         }
         return false;
@@ -656,7 +656,7 @@ public class NCLDescriptorSwitch<T extends NCLElement,
     
     
     @Override
-    public El findDescriptor(Object focusIndex) throws XMLException {
+    public El findDescriptor(Integer focusIndex) throws XMLException {
         El result;
         
         for(Ed desc : descriptors){
@@ -670,12 +670,14 @@ public class NCLDescriptorSwitch<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(T reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(T reference) throws XMLException {
         return references.remove(reference);
     }
@@ -686,6 +688,23 @@ public class NCLDescriptorSwitch<T extends NCLElement,
         return references;
     }
 
+    
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        if(defaultDescriptor != null)
+            defaultDescriptor.removeReference(this);
+        
+        defaultDescriptor = null;
+        
+        for(Ed d : descriptors)
+            d.clean();
+        
+        for(Eb b : binds)
+            b.clean();
+    }
+    
 
     /**
      * Function to create the child element <i>bindRule</i>.

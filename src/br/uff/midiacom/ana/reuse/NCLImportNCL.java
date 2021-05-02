@@ -110,4 +110,9 @@ public class NCLImportNCL<T extends NCLElement,
     protected String getType() {
         return "importNCL";
     }
+
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+    }
 }

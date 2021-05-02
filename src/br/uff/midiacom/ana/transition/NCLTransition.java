@@ -1021,12 +1021,14 @@ public class NCLTransition<T extends NCLElement,
     
     
     @Override
+    @Deprecated
     public boolean addReference(Ed reference) throws XMLException {
         return references.add(reference);
     }
     
     
     @Override
+    @Deprecated
     public boolean removeReference(Ed reference) throws XMLException {
         return references.remove(reference);
     }
@@ -1035,5 +1037,22 @@ public class NCLTransition<T extends NCLElement,
     @Override
     public ArrayList getReferences() {
         return references;
+    }
+
+    @Override
+    public void clean() throws XMLException {
+        setParent(null);
+        
+        type = null;
+        subtype = null;
+        dur = null;
+        startProgress = null;
+        endProgress = null;
+        direction = null;
+        fadeColor = null;
+        horRepeat = null;
+        vertRepeat = null;
+        borderWidth = null;
+        borderColor = null;
     }
 }
