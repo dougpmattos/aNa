@@ -39,60 +39,37 @@ package br.uff.midiacom.ana.util.enums;
 
 
 /**
- * Atributos de um nó (podem ser parametrizados pelo descritor) da <i>Nested Context Language</i> (NCL).
+ * Types dos elementos <i>effect</i> da <i>Nested Context Language</i> (NCL).
  */
-public enum NCLAttributes {
+public enum NCLEffectType {
 
-    TOP("top"),
-    LEFT("left"),
-    BOTTOM("bottom"),
-    RIGHT("right"),
-    WIDTH("width"),
-    HEIGHT("height"),
-    LOCATION("location"),
-    SIZE("size"),
-    BOUNDS("bounds"),
-    BACKGROUND("background"),
-    VISIBLE("visible"),
-    TRANSPARENCY("transparency"),
-    FIT("fit"),
-    SCROLL("scroll"),
-    STYLE("style"),
-    SOUND_LEVEL("soundLevel"),
-    BALANCE_LEVEL("balanceLevel"),
-    TREBLE_LEVEL("trebleLevel"),
-    BASS_LEVEL("bassLevel"),
-    ZINDEX("zIndex"),
-    FONT_FAMILY("fontFamily"),
-    FONT_SIZE("fontSize"),
-    FONT_VARIANT("fontVariant"),
-    FONT_WEIGHT("fontWeight"),
-    FONT_COLOR("fontColor"),
-    REUSE_PLAYER("reusePlayer"),
-    PLAYER_LIFE("playerLife"),
-    PRIORITY("priority"),
-    INTENSITY_VALUE("intensityValue"),
-    INTENSITY_RANGE("intensityRange"),
-    SCENT("scent"),
-    COLOR("color"),
-    FREQUENCY("frequency"),
-    DEFAULT("");
+    WIND("Wind Effect"),
+    LIGHT("Light Effect"),
+    FLASH("Flash Effect"),
+    SCENT("Scent Effect"),
+    WATER_SPRAYER("Water Sprayer Effect"),
+    FOG("Fog Effect"),
+    VIBRATION("Vibration Effect"),
+    COLD("Cold Effect"),
+    HOT("Hot Effect"),
+    RAINSTORM("Rainstorm Effect"),
+    OTHER("Other");
 
 
     private String name;
-    
-    private NCLAttributes(String name) {
+
+    private NCLEffectType(String name) {
         this.name = name;
     }
-    
-    public static NCLAttributes getEnumType(String name){
-        for(NCLAttributes opt : values()){
+
+    public static NCLEffectType getEnumType(String name){
+        for(NCLEffectType opt : values()){
             if(name.equals(opt.name))
                 return opt;
         }
         return null;
     }
-    
+
     @Override
     public String toString() {
         return name;

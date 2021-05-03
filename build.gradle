@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+group 'br.uff.midiacom'
+
+repositories {
+    mavenCentral()
+}
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
+dependencies {
+    implementation 'junit:junit:4.12'
+}

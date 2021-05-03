@@ -89,6 +89,7 @@ import org.w3c.dom.NodeList;
  *                      parent inferior margin. This attribute is optional.</li>
  *  <li><i>height</i> - height of the region. This attribute is optional.</li>
  *  <li><i>width</i> - width of the region. This attribute is optional.</li>
+ *  <li><i>location</i> - location of the effect. This attribute is required.</li>
  *  <li><i>zIndex</i> - precedence of the region regarding it superposition with
  *                      other regions. This attribute is optional.</li>
  * </ul>
@@ -103,8 +104,6 @@ import org.w3c.dom.NodeList;
  * </ul>
  * 
  * @param <T>
- * @param <P>
- * @param <I> 
  */
 public class NCLRegion<T extends NCLElement,
                        Er extends NCLRegion>
@@ -119,6 +118,7 @@ public class NCLRegion<T extends NCLElement,
     protected Object height;
     protected Object width;
     protected Integer zIndex;
+    protected Object location;
     protected ElementList<Er> regions;
     
     protected ArrayList<T> references;
@@ -196,6 +196,32 @@ public class NCLRegion<T extends NCLElement,
         return title;
     }
 
+
+    public void setLocation(Object location) throws XMLException {
+        Object aux = this.location;
+
+        if(location == null){
+            this.location = location;
+            notifyAltered(NCLElementAttributes.LOCATION, aux, location);
+            return;
+        }
+
+        if(location instanceof String){
+
+            String value = (String) location;
+            if("".equals(value.trim()))
+                throw new XMLException("Empty location String");
+            this.location = location;
+
+        } else
+            throw new XMLException("Wrong left type.");
+
+        notifyAltered(NCLElementAttributes.LOCATION, aux, location);
+    }
+
+    public Object getLocation() {
+        return location;
+    }
 
     /**
      * Sets the location of the region left side regarding the parent left

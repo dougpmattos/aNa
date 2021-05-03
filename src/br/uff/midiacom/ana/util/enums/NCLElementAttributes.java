@@ -173,6 +173,7 @@ public enum NCLElementAttributes {
     WIDTH("width"),
     XCONNECTOR("xconnector"),
     XMLNS("xmlns"),
+    LOCATION("location"),
     ZINDEX("zIndex");
 
     private String name;
