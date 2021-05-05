@@ -38,14 +38,7 @@
 package br.uff.midiacom.ana.descriptor;
 
 import br.uff.midiacom.ana.NCLElement;
-import br.uff.midiacom.ana.util.enums.NCLAttributes;
-import br.uff.midiacom.ana.util.enums.NCLColor;
-import br.uff.midiacom.ana.util.enums.NCLElementAttributes;
-import br.uff.midiacom.ana.util.enums.NCLFit;
-import br.uff.midiacom.ana.util.enums.NCLFontVariant;
-import br.uff.midiacom.ana.util.enums.NCLFontWeight;
-import br.uff.midiacom.ana.util.enums.NCLPlayerLife;
-import br.uff.midiacom.ana.util.enums.NCLScroll;
+import br.uff.midiacom.ana.util.enums.*;
 import br.uff.midiacom.ana.util.exception.NCLParsingException;
 import br.uff.midiacom.ana.util.exception.XMLException;
 import br.uff.midiacom.ana.util.ncl.NCLElementPrototype;
@@ -68,8 +61,6 @@ import org.w3c.dom.Element;
  * </ul>
  * 
  * @param <T>
- * @param <P>
- * @param <I>
  * @param <V> 
  */
 public class NCLDescriptorParam<T extends NCLElement, V>
@@ -353,7 +344,7 @@ public class NCLDescriptorParam<T extends NCLElement, V>
         
         if(value instanceof Integer[])
             return name.equals(NCLAttributes.BOUNDS) || name.equals(NCLAttributes.SIZE) ||
-                    name.equals(NCLAttributes.LOCATION);
+                    name.equals(NCLAttributes.LOCATION) || name.equals(NCLAttributes.COLOR);
         
         if(value instanceof Double[])
             return name.equals(NCLAttributes.BOUNDS) || name.equals(NCLAttributes.SIZE) ||
@@ -369,7 +360,8 @@ public class NCLDescriptorParam<T extends NCLElement, V>
                    name.equals(NCLAttributes.HEIGHT) || name.equals(NCLAttributes.FONT_SIZE) ||
                    name.equals(NCLAttributes.TRANSPARENCY) || name.equals(NCLAttributes.SOUND_LEVEL) ||
                    name.equals(NCLAttributes.BALANCE_LEVEL) || name.equals(NCLAttributes.TREBLE_LEVEL) ||
-                   name.equals(NCLAttributes.BASS_LEVEL);
+                   name.equals(NCLAttributes.BASS_LEVEL) || name.equals(NCLAttributes.PRIORITY) ||
+                    name.equals(NCLAttributes.FREQUENCY);
         
         if(value instanceof Double)
             return name.equals(NCLAttributes.FONT_SIZE) || name.equals(NCLAttributes.TRANSPARENCY) ||
@@ -378,13 +370,19 @@ public class NCLDescriptorParam<T extends NCLElement, V>
                    name.equals(NCLAttributes.TOP) || name.equals(NCLAttributes.LEFT) ||
                    name.equals(NCLAttributes.BOTTOM) || name.equals(NCLAttributes.RIGHT) ||
                    name.equals(NCLAttributes.WIDTH) || name.equals(NCLAttributes.HEIGHT);
-        
+
+        if (value instanceof Float)
+            return name.equals(NCLAttributes.INTENSITY_VALUE);
+
         if(value instanceof NCLColor)
             return name.equals(NCLAttributes.FONT_COLOR) || name.equals(NCLAttributes.BACKGROUND);
         
         if(value instanceof NCLFit)
             return name.equals(NCLAttributes.FIT);
-        
+
+        if(value instanceof NCLScentType)
+            return name.equals(NCLAttributes.SCENT);
+
         if(value instanceof NCLFontVariant)
             return name.equals(NCLAttributes.FONT_VARIANT);
         
@@ -401,7 +399,8 @@ public class NCLDescriptorParam<T extends NCLElement, V>
             return name.equals(NCLAttributes.BACKGROUND);
         
         if(value instanceof String)
-            return name.equals(NCLAttributes.STYLE) || name.equals(NCLAttributes.FONT_FAMILY);
+            return name.equals(NCLAttributes.STYLE) || name.equals(NCLAttributes.FONT_FAMILY)
+                    || name.equals(NCLAttributes.INTENSITY_RANGE) || name.equals(NCLAttributes.COLOR);
         
         return false;
     }

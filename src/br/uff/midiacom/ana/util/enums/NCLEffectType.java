@@ -43,22 +43,20 @@ package br.uff.midiacom.ana.util.enums;
  */
 public enum NCLEffectType {
 
-    WIND("Wind Effect"),
-    LIGHT("Light Effect"),
-    FLASH("Flash Effect"),
-    SCENT("Scent Effect"),
-    WATER_SPRAYER("Water Sprayer Effect"),
-    FOG("Fog Effect"),
-    VIBRATION("Vibration Effect"),
-    COLD("Cold Effect"),
-    HOT("Hot Effect"),
-    RAINSTORM("Rainstorm Effect"),
+    WIND("WindType"),
+    LIGHT("LightType"),
+    FLASH("FlashType"),
+    SCENT("ScentType"),
+    SPRAYING("SprayingType"),
+    FOG("FogType"),
+    VIBRATION("VibrationType"),
+    TEMPERATURE("TemperatureType"),
     OTHER("Other");
 
 
     private String name;
 
-    private NCLEffectType(String name) {
+    NCLEffectType(String name) {
         this.name = name;
     }
 
